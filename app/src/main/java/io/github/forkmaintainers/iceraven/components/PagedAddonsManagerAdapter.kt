@@ -56,7 +56,6 @@ private const val VIEW_HOLDER_TYPE_ADDON = 2
  * @property addonsManagerDelegate Delegate that will provides method for handling the add-on items.
  * @param addons The list of add-on based on the AMO store.
  * @property style Indicates how items should look like.
- * @property excludedAddonIDs A list of add-on IDs we could exclude. Currently ignored.
  */
 @Suppress("TooManyFunctions", "LargeClass")
 // We have an extra "Lint" Android Studio linter pass that Android Components
@@ -68,7 +67,6 @@ class PagedAddonsManagerAdapter(
     private val addonsManagerDelegate: AddonsManagerAdapterDelegate,
     addons: List<Addon>,
     private val style: Style? = null,
-    private val excludedAddonIDs: List<String> = emptyList()
 ) : ListAdapter<Any, CustomViewHolder>(DifferCallback) {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val logger = Logger("PagedAddonsManagerAdapter")

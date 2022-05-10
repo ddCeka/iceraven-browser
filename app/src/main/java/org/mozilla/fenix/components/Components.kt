@@ -146,6 +146,11 @@ class Components(private val context: Context) {
         AddonManager(core.store, core.engine, addonCollectionProvider, addonUpdater)
     }
 
+
+    /**
+     * Tell the addon-finding logic that it needs to go download the list of
+     * addons, from a source that may have changed.
+     */
     fun updateAddonManager() {
         addonCollectionProvider.deleteCacheFile(context)
 
