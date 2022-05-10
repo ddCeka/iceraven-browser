@@ -26,7 +26,7 @@ jobs:
           wrapper-cache-enabled: true
           dependencies-cache-enabled: true
           configuration-cache-enabled: true
-          arguments: assembleForkRelease -PversionName=${{ env.VERSION_NAME }}
+          arguments: app:assembleForkRelease -PversionName=${{ env.VERSION_NAME }}
       - name: Create signed APKs
         uses: abhijitvalluri/sign-apks@v0.8
         with:
