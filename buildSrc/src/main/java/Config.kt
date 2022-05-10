@@ -51,7 +51,13 @@ object Config {
             releaseVersion
         }
 
-        return version.split(".")[0]
+        val beforeDot = version.split(".")[0]
+        if (beforeDot.contains("-")) {
+            // Iceraven releases versions like iceraven-1.15.0, and this string
+            // needs to come out as a number.
+            return beforeDot.split("-")[1]
+        }
+        return beforeDot
     }
 
     /**
