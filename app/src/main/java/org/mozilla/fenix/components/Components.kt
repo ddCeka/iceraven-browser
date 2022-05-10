@@ -103,26 +103,12 @@ class Components(private val context: Context) {
     }
 
     val addonCollectionProvider by lazyMonitored {
-        // Check if we have a customized (overridden) AMO collection (only supported in Nightly)
-        if (Config.channel.isNightlyOrDebug && context.settings().amoCollectionOverrideConfigured()) {
-            PagedAddonCollectionProvider(
-                context,
-                core.client,
-                collectionAccount = context.settings().overrideAmoUser,
-                collectionName = context.settings().overrideAmoCollection
-            )
-        }
-        // Use Iceraven settings config otherwise
-        else {
-            PagedAddonCollectionProvider(
-                context,
-                core.client,
-                serverURL = BuildConfig.AMO_SERVER_URL,
-                collectionAccount = context.settings().customAddonsAccount,
-                collectionName = context.settings().customAddonsCollection,
-                maxCacheAgeInMinutes = AMO_COLLECTION_MAX_CACHE_AGE
-            )
-        }
+        PagedAddonCollectionProvider(
+            context,
+            core.client,
+            serverURL = BuildConfig.AMO_SERVER_URL,
+            maxCacheAgeInMinutes = AMO_COLLECTION_MAX_CACHE_AGE
+        )
     }
 
     @Suppress("MagicNumber")
@@ -146,18 +132,8 @@ class Components(private val context: Context) {
         AddonManager(core.store, core.engine, addonCollectionProvider, addonUpdater)
     }
 
-
-    /**
-     * Tell the addon-finding logic that it needs to go download the list of
-     * addons, from a source that may have changed.
-     */
-    fun updateAddonManager() {
+    fun clearAddonCache() {
         addonCollectionProvider.deleteCacheFile(context)
-
-        val addonsAccount = context.settings().customAddonsAccount
-        val addonsCollection = context.settings().customAddonsCollection
-        addonCollectionProvider.setCollectionAccount(addonsAccount)
-        addonCollectionProvider.setCollectionName(addonsCollection)
     }
 
     val analytics by lazyMonitored { Analytics(context) }

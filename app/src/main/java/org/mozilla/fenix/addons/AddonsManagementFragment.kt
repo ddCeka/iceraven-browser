@@ -30,6 +30,7 @@ import mozilla.components.feature.addons.Addon
 import mozilla.components.feature.addons.AddonManagerException
 import mozilla.components.feature.addons.ui.PermissionsDialogFragment
 import mozilla.components.feature.addons.ui.translateName
+import mozilla.components.support.base.log.logger.Logger
 import io.github.forkmaintainers.iceraven.components.PagedAddonInstallationDialogFragment
 import io.github.forkmaintainers.iceraven.components.PagedAddonsManagerAdapter
 import org.mozilla.fenix.R
@@ -51,7 +52,9 @@ import java.util.concurrent.CancellationException
  */
 @Suppress("TooManyFunctions", "LargeClass")
 class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) {
-
+    
+    private val logger = Logger("AddonsManagementFragment")
+    
     private val args by navArgs<AddonsManagementFragmentArgs>()
 
     private var binding: FragmentAddOnsManagementBinding? = null
@@ -70,6 +73,7 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        logger.info("Creating view for AddonsManagementFragment")
         setHasOptionsMenu(true)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
@@ -83,6 +87,7 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        logger.info("View created for AddonsManagementFragment")
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAddOnsManagementBinding.bind(view)
         bindRecyclerView()
@@ -139,11 +144,13 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
     }
 
     override fun onResume() {
+        logger.info("Resumed AddonsManagementFragment")
         super.onResume()
         showToolbar(getString(R.string.preferences_addons))
     }
 
     override fun onStart() {
+        logger.info("Started AddonsManagementFragment")
         super.onStart()
         findPreviousDialogFragment()?.let { dialog ->
             dialog.onPositiveButtonClicked = onPositiveButtonClicked
@@ -151,6 +158,7 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
     }
 
     override fun onDestroyView() {
+        logger.info("Destroyed view for AddonsManagementFragment")
         super.onDestroyView()
         // letting go of the resources to avoid memory leak.
         adapter = null
@@ -158,20 +166,25 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
     }
 
     private fun bindRecyclerView() {
+        logger.info("Binding recycler view for AddonsManagementFragment")
+        
         val managementView = AddonsManagementView(
             navController = findNavController(),
             showPermissionDialog = ::showPermissionDialog
         )
-
+        
         val recyclerView = binding?.addOnsList
         recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         val shouldRefresh = adapter != null
+        
+        logger.info("AddonsManagementFragment should refresh? ${shouldRefresh}")
 
         // If the fragment was launched to install an "external" add-on from AMO, we deactivate
         // the cache to get the most up-to-date list of add-ons to match against.
         val allowCache = args.installAddonId == null || installExternalAddonComplete
         lifecycleScope.launch(IO) {
             try {
+                logger.info("AddonsManagementFragment asking for addons")
                 addons = requireContext().components.addonManager.getAddons(allowCache = allowCache)
                 lifecycleScope.launch(Dispatchers.Main) {
                     runIfFragmentIsAttached {

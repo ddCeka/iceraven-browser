@@ -6,6 +6,7 @@ package org.mozilla.fenix.settings
 
 import androidx.core.content.edit
 import androidx.preference.Preference
+import mozilla.components.support.base.log.logger.Logger
 import org.mozilla.fenix.R
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.settings
@@ -15,7 +16,9 @@ import org.mozilla.fenix.ext.settings
  * The preference key is used as the shared preference key.
  */
 open class SharedPreferenceUpdater : Preference.OnPreferenceChangeListener {
-
+    
+    private val logger = Logger("SharedPreferenceUpdater")
+    
     override fun onPreferenceChange(preference: Preference, newValue: Any?): Boolean {
         if (newValue is Boolean) {
             preference.context.settings().preferences.edit {
@@ -25,12 +28,14 @@ open class SharedPreferenceUpdater : Preference.OnPreferenceChangeListener {
             preference.context.settings().preferences.edit {
                 putString(preference.key, newValue)
             }
-
+            logger.info("Set string preference ${preference.key} to ${newValue}")
             if (preference.key == preference.context.getString(R.string.pref_key_addons_custom_account) ||
                 preference.key == preference.context.getString(R.string.pref_key_addons_custom_collection)
             ) {
-                preference.context.components.updateAddonManager()
+                logger.info("Preference suggests clearing add-on cache")
+                preference.context.components.clearAddonCache()
             }
+            
         }
 
         return true
