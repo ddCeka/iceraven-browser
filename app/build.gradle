@@ -34,7 +34,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.mozilla"
+        applicationId "io.github.forkmaintainers"
         minSdkVersion Config.minSdkVersion
         targetSdkVersion Config.targetSdkVersion
         versionCode 1
@@ -66,7 +66,8 @@ android {
         def deepLinkSchemeValue = "fenix-dev"
         buildConfigField "String", "DEEP_LINK_SCHEME", "\"$deepLinkSchemeValue\""
         manifestPlaceholders = [
-                "deepLinkScheme": deepLinkSchemeValue
+                "deepLinkScheme": deepLinkSchemeValue,
+                "requestLegacyExternalStorage": true
         ]
 
         // Build flag for "Mozilla Online" variants. See `Config.isMozillaOnline`.
@@ -105,13 +106,19 @@ android {
             applicationIdSuffix ".fenix.debug"
             resValue "bool", "IS_DEBUG", "true"
             pseudoLocalesEnabled true
+            def deepLinkSchemeValue = "fenix-dev"
+            buildConfigField "String", "DEEP_LINK_SCHEME", "\"$deepLinkSchemeValue\""
+            manifestPlaceholders = [
+                    "deepLinkScheme": deepLinkSchemeValue,
+                    "requestLegacyExternalStorage": false
+            ]
         }
         nightly releaseTemplate >> {
             applicationIdSuffix ".fenix"
             buildConfigField "boolean", "USE_RELEASE_VERSIONING", "true"
             def deepLinkSchemeValue = "fenix-nightly"
             buildConfigField "String", "DEEP_LINK_SCHEME", "\"$deepLinkSchemeValue\""
-            manifestPlaceholders = ["deepLinkScheme": deepLinkSchemeValue]
+            manifestPlaceholders = ["deepLinkScheme": deepLinkSchemeValue, "requestLegacyExternalStorage": false]
         }
         beta releaseTemplate >> {
             buildConfigField "boolean", "USE_RELEASE_VERSIONING", "true"
@@ -127,7 +134,8 @@ android {
                     //  - https://issuetracker.google.com/issues/36924841
                     //  - https://issuetracker.google.com/issues/36905922
                     "sharedUserId": "org.mozilla.firefox.sharedID",
-                    "deepLinkScheme": deepLinkSchemeValue
+                    "deepLinkScheme": deepLinkSchemeValue,
+                    "requestLegacyExternalStorage": true
             ]
         }
         release releaseTemplate >> {
@@ -144,9 +152,38 @@ android {
                     //  - https://issuetracker.google.com/issues/36924841
                     //  - https://issuetracker.google.com/issues/36905922
                     "sharedUserId": "org.mozilla.firefox.sharedID",
-                    "deepLinkScheme": deepLinkSchemeValue
+                    "deepLinkScheme": deepLinkSchemeValue,
+                    "requestLegacyExternalStorage": true
             ]
         }
+        forkDebug {
+            shrinkResources false
+            minifyEnabled false
+            applicationIdSuffix ".iceraven.debug"
+            resValue "bool", "IS_DEBUG", "true"
+            pseudoLocalesEnabled true
+            // Need to replicate default debug config features
+            signingConfig signingConfigs.debug
+            debuggable true
+            def deepLinkSchemeValue = "iceraven-debug"
+            buildConfigField "String", "DEEP_LINK_SCHEME", "\"$deepLinkSchemeValue\""
+            // Use custom default allowed addon list
+            buildConfigField "String", "AMO_COLLECTION_USER", "\"16201230\""
+            buildConfigField "String", "AMO_COLLECTION_NAME", "\"What-I-want-on-Fenix\""
+        }
+        forkRelease releaseTemplate >> {
+            buildConfigField "boolean", "USE_RELEASE_VERSIONING", "true"
+            applicationIdSuffix ".iceraven"
+            def deepLinkSchemeValue = "iceraven"
+            buildConfigField "String", "DEEP_LINK_SCHEME", "\"$deepLinkSchemeValue\""
+            manifestPlaceholders = [
+                    "deepLinkScheme": deepLinkSchemeValue
+            ]
+            // Use custom default allowed addon list
+            buildConfigField "String", "AMO_COLLECTION_USER", "\"16201230\""
+            buildConfigField "String", "AMO_COLLECTION_NAME", "\"What-I-want-on-Fenix\""
+        }
+        
     }
 
     buildFeatures {
@@ -177,6 +214,24 @@ android {
         androidTest {
             resources.srcDirs += ['src/androidTest/resources']
         }
+<<<<<<< HEAD
+=======
+        beta {
+            java.srcDirs = ['src/migration/java']
+            manifest.srcFile "src/migration/AndroidManifest.xml"
+        }
+        release {
+            java.srcDirs = ['src/migration/java']
+            manifest.srcFile "src/migration/AndroidManifest.xml"
+        }
+        forkDebug {
+            java.srcDirs = ['src/geckoNightly/java']
+        }
+        forkRelease {
+            // No migration needed for fork
+            java.srcDirs = ['src/geckoRelease/java']
+        }
+>>>>>>> b26ac1b01... Do all of Iceraven in one commit
     }
 
     splits {
@@ -245,6 +300,7 @@ android.applicationVariants.all { variant ->
     println("Flavor:            " + variant.flavorName)
     println("Telemetry enabled: " + !isDebug)
 
+
     if (useReleaseVersioning) {
         // The Google Play Store does not allow multiple APKs for the same app that all have the
         // same version code. Therefore we need to have different version codes for our ARM and x86
@@ -281,7 +337,7 @@ android.applicationVariants.all { variant ->
 
     buildConfigField 'String', 'SENTRY_TOKEN', 'null'
     if (!isDebug) {
-        buildConfigField 'boolean', 'CRASH_REPORTING', 'true'
+        buildConfigField 'boolean', 'CRASH_REPORTING', 'false'
         // Reading sentry token from local file (if it exists). In a release task on taskcluster it will be available.
         try {
             def token = new File("${rootDir}/.sentry_token").text.trim()
@@ -292,7 +348,7 @@ android.applicationVariants.all { variant ->
     }
 
     if (!isDebug) {
-        buildConfigField 'boolean', 'TELEMETRY', 'true'
+        buildConfigField 'boolean', 'TELEMETRY', 'false'
     } else {
         buildConfigField 'boolean', 'TELEMETRY', 'false'
     }
@@ -551,11 +607,10 @@ dependencies {
     implementation Deps.mozilla_ui_tabcounter
 
     implementation Deps.mozilla_lib_crash
-    implementation Deps.lib_crash_sentry
-    implementation Deps.mozilla_lib_push_firebase
     implementation Deps.mozilla_lib_state
     implementation Deps.mozilla_lib_dataprotect
     debugImplementation Deps.leakcanary
+    forkDebugImplementation Deps.leakcanary
 
     implementation Deps.androidx_compose_ui
     implementation Deps.androidx_compose_ui_tooling
@@ -581,13 +636,6 @@ dependencies {
     implementation Deps.androidx_datastore
     implementation Deps.protobuf_javalite
     implementation Deps.google_material
-
-    implementation Deps.adjust
-    implementation Deps.installreferrer // Required by Adjust
-
-    implementation Deps.google_ads_id // Required for the Google Advertising ID
-
-    implementation Deps.google_play_store // Required for in-app reviews
 
     androidTestImplementation Deps.uiautomator
     androidTestImplementation "tools.fastlane:screengrab:2.0.0"
@@ -710,6 +758,9 @@ if (project.hasProperty("coverage")) {
     android {
         buildTypes {
             debug {
+                testCoverageEnabled true
+            }
+            forkDebug {
                 testCoverageEnabled true
             }
         }
