@@ -819,6 +819,9 @@ class TopSheetBehavior<V : View?>
             return behavior as TopSheetBehavior<V>
         }
 
+        /**
+         * Constrain a number between limits.
+         */
         fun constrain(amount: Int, low: Int, high: Int): Int {
             return if (amount < low) low else if (amount > high) high else amount
         }
