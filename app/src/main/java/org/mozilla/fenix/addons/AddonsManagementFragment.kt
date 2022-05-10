@@ -237,7 +237,7 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
         }
     }
 
-    private fun createAddonStyle(context: Context): AddonsManagerAdapter.Style {
+    private fun createAddonStyle(context: Context): PagedAddonsManagerAdapter.Style {
         return PagedAddonsManagerAdapter.Style(
             sectionsTextColor = ThemeManager.resolveAttribute(R.attr.textPrimary, context),
             addonNameTextColor = ThemeManager.resolveAttribute(R.attr.textPrimary, context),
