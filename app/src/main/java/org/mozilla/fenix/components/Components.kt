@@ -13,13 +13,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import com.google.android.play.core.review.ReviewManagerFactory
 import mozilla.components.feature.addons.AddonManager
-import mozilla.components.feature.addons.amo.AddonCollectionProvider
 import mozilla.components.feature.addons.migration.DefaultSupportedAddonsChecker
 import mozilla.components.feature.addons.update.DefaultAddonUpdater
 import mozilla.components.feature.autofill.AutofillConfiguration
 import mozilla.components.lib.publicsuffixlist.PublicSuffixList
 import mozilla.components.support.base.worker.Frequency
 import mozilla.components.support.locale.LocaleManager
+import io.github.forkmaintainers.iceraven.components.PagedAddonCollectionProvider
 import org.mozilla.fenix.BuildConfig
 import org.mozilla.fenix.Config
 import org.mozilla.fenix.HomeActivity
@@ -105,29 +105,23 @@ class Components(private val context: Context) {
     val addonCollectionProvider by lazyMonitored {
         // Check if we have a customized (overridden) AMO collection (only supported in Nightly)
         if (Config.channel.isNightlyOrDebug && context.settings().amoCollectionOverrideConfigured()) {
-            AddonCollectionProvider(
+            PagedAddonCollectionProvider(
                 context,
                 core.client,
-                collectionUser = context.settings().overrideAmoUser,
+                collectionAccount = context.settings().overrideAmoUser,
                 collectionName = context.settings().overrideAmoCollection
             )
         }
-        // Use build config otherwise
-        else if (!BuildConfig.AMO_COLLECTION_USER.isNullOrEmpty() &&
-            !BuildConfig.AMO_COLLECTION_NAME.isNullOrEmpty()
-        ) {
-            AddonCollectionProvider(
+        // Use Iceraven settings config otherwise
+        else {
+            PagedAddonCollectionProvider(
                 context,
                 core.client,
                 serverURL = BuildConfig.AMO_SERVER_URL,
-                collectionUser = BuildConfig.AMO_COLLECTION_USER,
-                collectionName = BuildConfig.AMO_COLLECTION_NAME,
+                collectionAccount = context.settings().customAddonsAccount,
+                collectionName = context.settings().customAddonsCollection,
                 maxCacheAgeInMinutes = AMO_COLLECTION_MAX_CACHE_AGE
             )
-        }
-        // Fall back to defaults
-        else {
-            AddonCollectionProvider(context, core.client, maxCacheAgeInMinutes = AMO_COLLECTION_MAX_CACHE_AGE)
         }
     }
 
@@ -150,6 +144,15 @@ class Components(private val context: Context) {
 
     val addonManager by lazyMonitored {
         AddonManager(core.store, core.engine, addonCollectionProvider, addonUpdater)
+    }
+
+    fun updateAddonManager() {
+        addonCollectionProvider.deleteCacheFile(context)
+
+        val addonsAccount = context.settings().customAddonsAccount
+        val addonsCollection = context.settings().customAddonsCollection
+        addonCollectionProvider.setCollectionAccount(addonsAccount)
+        addonCollectionProvider.setCollectionName(addonsCollection)
     }
 
     val analytics by lazyMonitored { Analytics(context) }

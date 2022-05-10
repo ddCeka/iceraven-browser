@@ -35,7 +35,7 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mozilla.fenix.GleanMetrics.SyncAccount
@@ -99,6 +99,7 @@ class ShareControllerTest {
         verify { dismiss(ShareController.Result.DISMISSED) }
     }
 
+    @Ignore("Intermittently failing; will be fixed with #9212 and #8725.")
     @Test
     fun `handleShareToApp should start a new sharing activity and close this`() = runBlocking {
         val appPackageName = "package"

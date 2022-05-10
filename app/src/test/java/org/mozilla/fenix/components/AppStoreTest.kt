@@ -187,6 +187,18 @@ class AppStoreTest {
     }
 
     @Test
+    fun `Test disbanding search group in HomeFragmentStore`() = runBlocking {
+        val g1 = HistoryMetadataGroup(title = "test One")
+        val g2 = HistoryMetadataGroup(title = "test two")
+        val historyMetadata: List<HistoryMetadataGroup> = listOf(g1, g2)
+        homeFragmentStore.dispatch(HomeFragmentAction.HistoryMetadataChange(historyMetadata)).join()
+        assertEquals(historyMetadata, homeFragmentStore.state.historyMetadata)
+
+        homeFragmentStore.dispatch(HomeFragmentAction.DisbandSearchGroupAction("Test one")).join()
+        assertEquals(listOf(g2), homeFragmentStore.state.historyMetadata)
+    }
+
+    @Test
     fun `Test changing hiding collections placeholder`() = runBlocking {
         assertTrue(appStore.state.showCollectionPlaceholder)
 

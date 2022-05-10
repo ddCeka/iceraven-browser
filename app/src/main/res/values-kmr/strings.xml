@@ -62,7 +62,7 @@
     <string moz:removedIn="97" name="recently_saved_show_all_content_description" tools:ignore="UnusedResources">Bişkoka bijareyên tomarbûyî nîşan bide</string>
 
     <!-- About content. The first parameter is the name of the application. (For example: Fenix) -->
-    <string name="about_content">%1$s berhemeke Mozillayê ye.</string>
+    <string name="about_content">%1$s berhemeke @fork-maintainersyê ye.</string>
 
     <!-- Private Browsing -->
     <!-- Title for private session option -->

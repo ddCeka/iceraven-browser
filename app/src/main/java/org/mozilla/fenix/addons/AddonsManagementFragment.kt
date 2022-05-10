@@ -7,8 +7,14 @@ package org.mozilla.fenix.addons
 import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
+import android.view.inputmethod.EditorInfo
+import androidx.appcompat.widget.SearchView
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
@@ -22,12 +28,10 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import mozilla.components.feature.addons.Addon
 import mozilla.components.feature.addons.AddonManagerException
-import mozilla.components.feature.addons.ui.AddonInstallationDialogFragment
-import mozilla.components.feature.addons.ui.AddonsManagerAdapter
 import mozilla.components.feature.addons.ui.PermissionsDialogFragment
 import mozilla.components.feature.addons.ui.translateName
-import org.mozilla.fenix.BuildConfig
-import org.mozilla.fenix.Config
+import io.github.forkmaintainers.iceraven.components.PagedAddonInstallationDialogFragment
+import io.github.forkmaintainers.iceraven.components.PagedAddonsManagerAdapter
 import org.mozilla.fenix.R
 import org.mozilla.fenix.components.FenixSnackbar
 import org.mozilla.fenix.components.metrics.Event
@@ -39,6 +43,7 @@ import org.mozilla.fenix.ext.settings
 import org.mozilla.fenix.ext.showToolbar
 import org.mozilla.fenix.ext.runIfFragmentIsAttached
 import org.mozilla.fenix.theme.ThemeManager
+import java.util.Locale
 import java.lang.ref.WeakReference
 import java.util.concurrent.CancellationException
 
@@ -56,6 +61,19 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
      * Whether or not an add-on installation is in progress.
      */
     private var isInstallationInProgress = false
+    private var adapter: PagedAddonsManagerAdapter? = null
+    // We must save the add-on list in the class, or we won't have it
+    // downloaded for the non-suspending search function
+    private var addons: List<Addon>? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setHasOptionsMenu(true)
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
 
     private var installExternalAddonComplete: Boolean
         set(value) {
@@ -65,12 +83,60 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
             return arguments?.getBoolean(BUNDLE_KEY_INSTALL_EXTERNAL_ADDON_COMPLETE, false) ?: false
         }
 
-    private var adapter: AddonsManagerAdapter? = null
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAddOnsManagementBinding.bind(view)
         bindRecyclerView()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.addons_menu, menu)
+        val searchItem = menu.findItem(R.id.search)
+        val searchView: SearchView = searchItem.actionView as SearchView
+        searchView.imeOptions = EditorInfo.IME_ACTION_DONE
+        searchView.queryHint = getString(R.string.addons_search_hint)
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return searchAddons(query.trim())
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                return searchAddons(newText.trim())
+            }
+        })
+    }
+
+    private fun searchAddons(addonNameSubStr: String): Boolean {
+        if (adapter == null) {
+            return false
+        }
+
+        val searchedAddons = arrayListOf<Addon>()
+
+        addons?.forEach { addon ->
+            val names = addon.translatableName
+            names["en-US"]?.let { name ->
+                if (name.lowercase().contains(addonNameSubStr.lowercase())) {
+                    searchedAddons.add(addon)
+                }
+            }
+        }
+        updateUI(searchedAddons)
+
+        return true
+    }
+
+    private fun updateUI(searchedAddons: List<Addon>) {
+        adapter?.updateAddons(searchedAddons)
+
+        if (searchedAddons.isEmpty()) {
+            binding?.addOnsEmptyMessage?.visibility = View.VISIBLE
+            binding?.addOnsList?.visibility = View.GONE
+        } else {
+            binding?.addOnsEmptyMessage?.visibility = View.GONE
+            binding?.addOnsList?.visibility = View.VISIBLE
+        }
     }
 
     override fun onResume() {
@@ -107,24 +173,15 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
         val allowCache = args.installAddonId == null || installExternalAddonComplete
         lifecycleScope.launch(IO) {
             try {
-                val addons = requireContext().components.addonManager.getAddons(allowCache = allowCache)
-                // Add-ons that should be excluded in Mozilla Online builds
-                val excludedAddonIDs = if (Config.channel.isMozillaOnline &&
-                    !BuildConfig.MOZILLA_ONLINE_ADDON_EXCLUSIONS.isNullOrEmpty()
-                ) {
-                    BuildConfig.MOZILLA_ONLINE_ADDON_EXCLUSIONS.toList()
-                } else {
-                    emptyList<String>()
-                }
+                addons = requireContext().components.addonManager.getAddons(allowCache = allowCache)
                 lifecycleScope.launch(Dispatchers.Main) {
                     runIfFragmentIsAttached {
                         if (!shouldRefresh) {
-                            adapter = AddonsManagerAdapter(
+                            adapter = PagedAddonsManagerAdapter(
                                 requireContext().components.addonCollectionProvider,
                                 managementView,
-                                addons,
-                                style = createAddonStyle(requireContext()),
-                                excludedAddonIDs
+                                addons!!,
+                                style = createAddonStyle(requireContext())
                             )
                         }
                         isInstallationInProgress = false
@@ -133,12 +190,12 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
 
                         recyclerView?.adapter = adapter
                         if (shouldRefresh) {
-                            adapter?.updateAddons(addons)
+                            adapter?.updateAddons(addons!!)
                         }
 
                         args.installAddonId?.let { addonIn ->
                             if (!installExternalAddonComplete) {
-                                installExternalAddon(addons, addonIn)
+                                installExternalAddon(addons!!, addonIn)
                             }
                         }
                     }
@@ -183,7 +240,7 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
     }
 
     private fun createAddonStyle(context: Context): AddonsManagerAdapter.Style {
-        return AddonsManagerAdapter.Style(
+        return PagedAddonsManagerAdapter.Style(
             sectionsTextColor = ThemeManager.resolveAttribute(R.attr.textPrimary, context),
             addonNameTextColor = ThemeManager.resolveAttribute(R.attr.textPrimary, context),
             addonSummaryTextColor = ThemeManager.resolveAttribute(R.attr.textSecondary, context),
@@ -202,7 +259,7 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
 
     private fun hasExistingAddonInstallationDialogFragment(): Boolean {
         return parentFragmentManager.findFragmentByTag(INSTALLATION_DIALOG_FRAGMENT_TAG)
-            as? AddonInstallationDialogFragment != null
+                as? PagedAddonInstallationDialogFragment != null
     }
 
     @VisibleForTesting
@@ -242,10 +299,10 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
             // See https://github.com/mozilla-mobile/fenix/issues/15816
             val weakApplicationContext: WeakReference<Context> = WeakReference(context)
 
-            val dialog = AddonInstallationDialogFragment.newInstance(
+            val dialog = PagedAddonInstallationDialogFragment.newInstance(
                 addon = addon,
                 addonCollectionProvider = addonCollectionProvider,
-                promptsStyling = AddonInstallationDialogFragment.PromptsStyling(
+                promptsStyling = PagedAddonInstallationDialogFragment.PromptsStyling(
                     gravity = Gravity.BOTTOM,
                     shouldWidthMatchParent = true,
                     confirmButtonBackgroundColor = ThemeManager.resolveAttribute(

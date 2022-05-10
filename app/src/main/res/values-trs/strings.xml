@@ -32,7 +32,7 @@
     <string name="tab_tray_select_collection">Nāguī sa màn yì\'nïn\'ïn</string>
 
     <!-- About content. The first parameter is the name of the application. (For example: Fenix) -->
-    <string name="about_content">%1$s huin \’ngō sa giri Mozilla.</string>
+    <string name="about_content">%1$s huin \’ngō sa giri @fork-maintainers.</string>
 
     <!-- Private Browsing -->
     <!-- Explanation for private browsing displayed to users on home view when they first enable private mode
