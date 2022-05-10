@@ -41,7 +41,6 @@ import org.mozilla.fenix.ext.settings
 import org.mozilla.fenix.ext.showToolbar
 import org.mozilla.fenix.ext.runIfFragmentIsAttached
 import org.mozilla.fenix.theme.ThemeManager
-import java.util.Locale
 import java.lang.ref.WeakReference
 import java.util.concurrent.CancellationException
 
@@ -257,7 +256,7 @@ class AddonsManagementFragment : Fragment(R.layout.fragment_add_ons_management) 
 
     private fun hasExistingAddonInstallationDialogFragment(): Boolean {
         return parentFragmentManager.findFragmentByTag(INSTALLATION_DIALOG_FRAGMENT_TAG)
-                as? PagedAddonInstallationDialogFragment != null
+            as? PagedAddonInstallationDialogFragment != null
     }
 
     @VisibleForTesting

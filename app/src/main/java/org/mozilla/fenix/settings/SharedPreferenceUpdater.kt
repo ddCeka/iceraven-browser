@@ -27,7 +27,8 @@ open class SharedPreferenceUpdater : Preference.OnPreferenceChangeListener {
             }
 
             if (preference.key == preference.context.getString(R.string.pref_key_addons_custom_account) ||
-                preference.key == preference.context.getString(R.string.pref_key_addons_custom_collection)) {
+                preference.key == preference.context.getString(R.string.pref_key_addons_custom_collection)
+            ) {
                 preference.context.components.updateAddonManager()
             }
         }
