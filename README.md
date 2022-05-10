@@ -79,8 +79,10 @@ echo "autosignReleaseWithDebugKey=" >>local.properties
 6. Build the project. To build the Iceraven-branded release APKs, you can do:
 
 ```sh
-./gradlew assembleForkRelease -PversionName="$(git describe --tags HEAD)"
+./gradlew app:assembleForkRelease -PversionName="$(git describe --tags HEAD)"
 ```
+
+(If you don't use the `app:` prefix, you might get complaints about the build system being `unable to locate the objcopy executable`.)
 
 The APKs will show up in `app/build/outputs/apk/forkRelease/`.
 
