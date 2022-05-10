@@ -1,6 +1,7 @@
 ---
 channels:
   - release
+  - forkRelease
   - beta
   - nightly
   - developer
