@@ -113,7 +113,7 @@ class BrowserToolbarView(
                 )
 
                 display.urlFormatter =
-                    if (context.settings().shouldStripUrl) {
+                    if (settings.shouldStripUrl) {
                             url -> URLStringUtils.toDisplayUrl(url)
                     } else {
                             url -> url
