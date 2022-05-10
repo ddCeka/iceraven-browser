@@ -214,24 +214,6 @@ android {
         androidTest {
             resources.srcDirs += ['src/androidTest/resources']
         }
-<<<<<<< HEAD
-=======
-        beta {
-            java.srcDirs = ['src/migration/java']
-            manifest.srcFile "src/migration/AndroidManifest.xml"
-        }
-        release {
-            java.srcDirs = ['src/migration/java']
-            manifest.srcFile "src/migration/AndroidManifest.xml"
-        }
-        forkDebug {
-            java.srcDirs = ['src/geckoNightly/java']
-        }
-        forkRelease {
-            // No migration needed for fork
-            java.srcDirs = ['src/geckoRelease/java']
-        }
->>>>>>> b26ac1b01... Do all of Iceraven in one commit
     }
 
     splits {
