@@ -100,9 +100,7 @@ We encourage you to participate in this open source project. We love Pull Reques
 
 ### How to Appease the Linter
 
-If you are getting errors form `./gradelw ktlint`, try running `./gradlew
-ktlintFormat` to let `ktlint` decide how to lay out your code, instead of just
-yelling at you that you can't read its mind.
+If you are getting errors form `./gradelw ktlint`, try running `./gradlew ktlintFormat` to let `ktlint` decide how to lay out your code, instead of just yelling at you that you can't read its mind.
 
 ### 🙅 How to skip CI checks for PRs 🙅
 
