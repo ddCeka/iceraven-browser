@@ -23,6 +23,8 @@ import mozilla.components.support.ktx.util.writeString
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import org.mozilla.fenix.Config
+import org.mozilla.fenix.ext.settings
 import java.io.File
 import java.io.IOException
 import java.util.Date
@@ -30,8 +32,6 @@ import java.util.concurrent.TimeUnit
 
 internal const val API_VERSION = "api/v4"
 internal const val DEFAULT_SERVER_URL = "https://addons.mozilla.org"
-internal const val DEFAULT_COLLECTION_ACCOUNT = "mozilla"
-internal const val DEFAULT_COLLECTION_NAME = "7e8d6dc651b54ab385fb8791bf9dac"
 internal const val COLLECTION_FILE_NAME = "%s_components_addon_collection_%s.json"
 internal const val MINUTE_IN_MS = 60 * 1000
 internal const val DEFAULT_READ_TIMEOUT_IN_SECONDS = 20L
@@ -48,10 +48,6 @@ internal const val DEFAULT_READ_TIMEOUT_IN_SECONDS = 20L
  *
  * @property serverURL The url of the endpoint to interact with e.g production, staging
  * or testing. Defaults to [DEFAULT_SERVER_URL].
- * @property collectionAccount The account owning the collection to access, defaults
- * to [DEFAULT_COLLECTION_ACCOUNT].
- * @property collectionName The name of the collection to access, defaults
- * to [DEFAULT_COLLECTION_NAME].
  * @property maxCacheAgeInMinutes maximum time (in minutes) the collection cache
  * should remain valid. Defaults to -1, meaning no cache is being used by default.
  * @property client A reference of [Client] for interacting with the AMO HTTP api.
@@ -61,8 +57,6 @@ class PagedAddonCollectionProvider(
     private val context: Context,
     private val client: Client,
     private val serverURL: String = DEFAULT_SERVER_URL,
-    private var collectionAccount: String = DEFAULT_COLLECTION_ACCOUNT,
-    private var collectionName: String = DEFAULT_COLLECTION_NAME,
     private val maxCacheAgeInMinutes: Long = -1
 ) : AddonsProvider {
 
@@ -70,12 +64,30 @@ class PagedAddonCollectionProvider(
 
     private val diskCacheLock = Any()
 
-    fun setCollectionAccount(account: String) {
-        collectionAccount = account
+    /**
+     * Get the account we should be fetching addons from.
+     */
+    private fun getCollectionAccount(): String {
+        var result = context.settings().customAddonsAccount
+        if (Config.channel.isNightlyOrDebug && context.settings().amoCollectionOverrideConfigured()) {
+            result = context.settings().overrideAmoUser
+        }
+        
+        logger.info("Determined collection account: ${result}")
+        return result
     }
-
-    fun setCollectionName(collection: String) {
-        collectionName = collection
+    
+    /**
+     * Get the collection name we should be fetching addons from.
+     */
+    private fun getCollectionName(): String {
+        var result = context.settings().customAddonsCollection
+        if (Config.channel.isNightlyOrDebug && context.settings().amoCollectionOverrideConfigured()) {
+            result = context.settings().overrideAmoCollection
+        }
+        
+        logger.info("Determined collection name: ${result}")
+        return result
     }
 
     /**
@@ -103,10 +115,15 @@ class PagedAddonCollectionProvider(
         } else {
             null
         }
-
+        
+        val collectionAccount = getCollectionAccount()
+        val collectionName = getCollectionName()
+        
         if (cachedAddons != null) {
+            logger.info("Providing cached list of addons for ${collectionAccount} collection ${collectionName}")
             return cachedAddons
         } else {
+            logger.info("Fetching fresh list of addons for ${collectionAccount} collection ${collectionName}")
             return getAllPages(
                 listOf(
                     serverURL,
@@ -199,6 +216,7 @@ class PagedAddonCollectionProvider(
 
     @VisibleForTesting
     internal fun writeToDiskCache(collectionResponse: String) {
+        logger.info("Storing cache file")
         synchronized(diskCacheLock) {
             getCacheFile(context).writeString { collectionResponse }
         }
@@ -206,6 +224,7 @@ class PagedAddonCollectionProvider(
 
     @VisibleForTesting
     internal fun readFromDiskCache(): List<Addon>? {
+        logger.info("Loading cache file")
         synchronized(diskCacheLock) {
             return getCacheFile(context).readAndDeserialize {
                 JSONObject(it).getAddons()
@@ -229,12 +248,17 @@ class PagedAddonCollectionProvider(
     }
 
     private fun getBaseCacheFile(context: Context): File {
+        val collectionAccount = getCollectionAccount()
+        val collectionName = getCollectionName()
         return File(context.filesDir, COLLECTION_FILE_NAME.format(collectionAccount, collectionName))
     }
 
     fun deleteCacheFile(context: Context): Boolean {
-        val file = getBaseCacheFile(context)
-        return if (file.exists()) file.delete() else false
+        logger.info("Clearing cache file")
+        synchronized(diskCacheLock) {
+            val file = getBaseCacheFile(context)
+            return if (file.exists()) file.delete() else false
+        }
     }
 }
 
