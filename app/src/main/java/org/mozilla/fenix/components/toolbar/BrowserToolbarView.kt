@@ -114,9 +114,11 @@ class BrowserToolbarView(
 
                 display.urlFormatter =
                     if (settings.shouldStripUrl) {
-                            url -> URLStringUtils.toDisplayUrl(url)
+                        url ->
+                        URLStringUtils.toDisplayUrl(url)
                     } else {
-                            url -> url
+                        url ->
+                        url
                     }
 
                 display.colors = display.colors.copy(

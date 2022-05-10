@@ -154,7 +154,7 @@ class PagedAddonInstallationDialogFragment : AppCompatDialogFragment() {
             null,
             false
         )
-        
+
         val binding = MozacFeatureAddonsFragmentDialogAddonInstalledBinding.bind(rootView)
 
         rootView.findViewById<TextView>(R.id.title).text =

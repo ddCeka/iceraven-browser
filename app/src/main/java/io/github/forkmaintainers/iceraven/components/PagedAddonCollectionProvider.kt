@@ -107,15 +107,18 @@ class PagedAddonCollectionProvider(
         if (cachedAddons != null) {
             return cachedAddons
         } else {
-            return getAllPages(listOf(
-                serverURL,
-                API_VERSION,
-                "accounts/account",
-                collectionAccount,
-                "collections",
-                collectionName,
-                "addons"
-            ).joinToString("/"), readTimeoutInSeconds ?: DEFAULT_READ_TIMEOUT_IN_SECONDS).also {
+            return getAllPages(
+                listOf(
+                    serverURL,
+                    API_VERSION,
+                    "accounts/account",
+                    collectionAccount,
+                    "collections",
+                    collectionName,
+                    "addons"
+                ).joinToString("/"),
+                readTimeoutInSeconds ?: DEFAULT_READ_TIMEOUT_IN_SECONDS
+            ).also {
                 // Cache the JSON object before we parse out the addons
                 if (maxCacheAgeInMinutes > 0) {
                     writeToDiskCache(it.toString())
@@ -147,26 +150,26 @@ class PagedAddonCollectionProvider(
                     readTimeout = Pair(readTimeoutInSeconds, TimeUnit.SECONDS)
                 )
             )
-            .use { response ->
-                if (!response.isSuccess) {
-                    val errorMessage = "Failed to fetch addon collection. Status code: ${response.status}"
-                    logger.error(errorMessage)
-                    throw IOException(errorMessage)
-                }
+                .use { response ->
+                    if (!response.isSuccess) {
+                        val errorMessage = "Failed to fetch addon collection. Status code: ${response.status}"
+                        logger.error(errorMessage)
+                        throw IOException(errorMessage)
+                    }
 
-                val currentResponse = try {
-                    JSONObject(response.body.string(Charsets.UTF_8))
-                } catch (e: JSONException) {
-                    throw IOException(e)
+                    val currentResponse = try {
+                        JSONObject(response.body.string(Charsets.UTF_8))
+                    } catch (e: JSONException) {
+                        throw IOException(e)
+                    }
+                    if (compiledResponse == null) {
+                        compiledResponse = currentResponse
+                    } else {
+                        // Write the addons into the first response
+                        compiledResponse!!.getJSONArray("results").concat(currentResponse.getJSONArray("results"))
+                    }
+                    nextURL = if (currentResponse.isNull("next")) null else currentResponse.getString("next")
                 }
-                if (compiledResponse == null) {
-                    compiledResponse = currentResponse
-                } else {
-                    // Write the addons into the first response
-                    compiledResponse!!.getJSONArray("results").concat(currentResponse.getJSONArray("results"))
-                }
-                nextURL = if (currentResponse.isNull("next")) null else currentResponse.getString("next")
-            }
         }
         return compiledResponse!!
     }
@@ -181,7 +184,7 @@ class PagedAddonCollectionProvider(
         var bitmap: Bitmap? = null
         if (addon.iconUrl != "") {
             client.fetch(
-                    Request(url = addon.iconUrl.sanitizeURL())
+                Request(url = addon.iconUrl.sanitizeURL())
             ).use { response ->
                 if (response.isSuccess) {
                     response.body.useStream {
@@ -306,9 +309,11 @@ internal fun JSONObject.getCurrentVersion(): String {
 }
 
 internal fun JSONObject.getDownload(): JSONObject? {
-    return (getJSONObject("current_version")
-        .optJSONArray("files")
-        ?.getJSONObject(0))
+    return (
+        getJSONObject("current_version")
+            .optJSONArray("files")
+            ?.getJSONObject(0)
+        )
 }
 
 internal fun JSONObject.getDownloadId(): String {

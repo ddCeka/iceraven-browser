@@ -115,7 +115,8 @@ class TopSheetBehavior<V : View?>
             if (mViewRef != null && mViewRef!!.get() != null) {
                 mMinOffset =
                     (-mViewRef!!.get()!!.height).coerceAtLeast(
-                        -(mViewRef!!.get()!!.height - mPeekHeight))
+                        -(mViewRef!!.get()!!.height - mPeekHeight)
+                    )
             }
         }
 
@@ -175,7 +176,8 @@ class TopSheetBehavior<V : View?>
             super.onSaveInstanceState(
                 parent,
                 child!!
-            ), mState
+            ),
+            mState
         )
     }
 
@@ -283,7 +285,7 @@ class TopSheetBehavior<V : View?>
                     mTouchingScrollingChild = true
                 }
                 mIgnoreEvents = mActivePointerId == MotionEvent.INVALID_POINTER_ID &&
-                        !parent.isPointInChildBounds(child, initialX, mInitialY)
+                    !parent.isPointInChildBounds(child, initialX, mInitialY)
             }
         }
         if (!mIgnoreEvents && mViewDragHelper!!.shouldInterceptTouchEvent(event)) {
@@ -294,12 +296,12 @@ class TopSheetBehavior<V : View?>
         // happening over the scrolling content as nested scrolling logic handles that case.
         val scroll = mNestedScrollingChildRef!!.get()
         return action == MotionEvent.ACTION_MOVE && scroll != null &&
-                !mIgnoreEvents && mState != STATE_DRAGGING &&
-                !parent.isPointInChildBounds(
-                    scroll,
-                    event.x.toInt(),
-                    event.y.toInt()
-                ) && abs(mInitialY - event.y) > mViewDragHelper!!.touchSlop
+            !mIgnoreEvents && mState != STATE_DRAGGING &&
+            !parent.isPointInChildBounds(
+                scroll,
+                event.x.toInt(),
+                event.y.toInt()
+            ) && abs(mInitialY - event.y) > mViewDragHelper!!.touchSlop
     }
 
     override fun onTouchEvent(
@@ -328,7 +330,8 @@ class TopSheetBehavior<V : View?>
             // The ViewDragHelper tries to capture only the top-most View. We have to explicitly tell it
             // to capture the top sheet in case it is not captured and the touch slop is passed.
             if (action == MotionEvent.ACTION_MOVE && !mIgnoreEvents &&
-                    abs(mInitialY - event.y) > mViewDragHelper!!.touchSlop) {
+                abs(mInitialY - event.y) > mViewDragHelper!!.touchSlop
+            ) {
                 mViewDragHelper!!.captureChildView(
                     child,
                     event.getPointerId(event.actionIndex)
@@ -449,11 +452,13 @@ class TopSheetBehavior<V : View?>
         velocityY: Float
     ): Boolean {
         return target === mNestedScrollingChildRef!!.get() &&
-                (mState != STATE_EXPANDED ||
-                        super.onNestedPreFling(
-                            coordinatorLayout, child!!, target,
-                            velocityX, velocityY
-                        ))
+            (
+                mState != STATE_EXPANDED ||
+                    super.onNestedPreFling(
+                        coordinatorLayout, child!!, target,
+                        velocityX, velocityY
+                    )
+                )
     }
 
     /**
@@ -482,7 +487,7 @@ class TopSheetBehavior<V : View?>
             if (mViewRef == null) {
                 // The view is not laid out yet; modify mState and let onLayoutChild handle it later
                 val stateCondition = state == STATE_COLLAPSED || state == STATE_EXPANDED ||
-                        isHideable && state == STATE_HIDDEN
+                    isHideable && state == STATE_HIDDEN
                 if (stateCondition) {
                     mState = state
                 }

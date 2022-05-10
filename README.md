@@ -98,6 +98,12 @@ Developers are especially welcome, wanted, and needed.
 
 We encourage you to participate in this open source project. We love Pull Requests, Bug Reports, ideas, (security) code reviews or any other kind of positive contribution.
 
+### How to Appease the Linter
+
+If you are getting errors form `./gradelw ktlint`, try running `./gradlew
+ktlintFormat` to let `ktlint` decide how to lay out your code, instead of just
+yelling at you that you can't read its mind.
+
 ### 🙅 How to skip CI checks for PRs 🙅
 
 If you want to skip Github CI checks in a PR, please add the following to the PR title exactly: `[skip ci]`.
