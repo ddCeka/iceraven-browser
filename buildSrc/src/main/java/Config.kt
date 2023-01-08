@@ -51,7 +51,17 @@ object Config {
             releaseVersion
         }
 
-        return version.split(".")[0]
+        var processedVersion = version.split(".")[0]
+        if (processedVersion.contains("-")) {
+            // Iceraven releases versions like iceraven-1.15.0, and this string
+            // needs to come out as a number.
+            processedVersion = processedVersion.split("-")[1]
+        }
+        processedVersion = processedVersion.replace("[^0-9]".toRegex(), "")
+        if (processedVersion.length == 0) {
+            return "0"
+        }
+        return processedVersion
     }
 
     /**

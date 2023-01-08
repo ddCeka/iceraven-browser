@@ -53,16 +53,16 @@
     <string name="recently_saved_menu_item_remove">Fuortsmite</string>
 
     <!-- About content. The first parameter is the name of the application. (For example: Fenix) -->
-    <string name="about_content">%1$s is makke troch Mozilla.</string>
+    <string name="about_content">%1$s is makke troch @fork-maintainers.</string>
 
     <!-- Private Browsing -->
     <!-- Explanation for private browsing displayed to users on home view when they first enable private mode
         The first parameter is the name of the app defined in app_name (for example: Fenix) -->
     <string name="private_browsing_placeholder_description_2">%1$s wisket jo syk- en browserskiednis sa gau as jo de tapassing ôfslute of alle priveeljepblêden slute. Hoewol dit jo net anonym makket foar websites of jo ynternetprovider, makket dit it makliker om wat jo online dogge privee te hâlden tsjinoer oaren dy’t dit apparaat brûke.</string>
     <string name="private_browsing_common_myths">
-       
+
        Faaks hearde myten oer priveenavigaasje
-    
+
     </string>
 
     <!-- Private mode shortcut "contextual feature recommendation" (CFR) -->

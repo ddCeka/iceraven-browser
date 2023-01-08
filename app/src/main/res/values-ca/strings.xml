@@ -51,7 +51,7 @@
     <string name="recently_saved_menu_item_remove">Elimina</string>
 
     <!-- About content. The first parameter is the name of the application. (For example: Fenix) -->
-    <string name="about_content">El %1$s està creat per Mozilla.</string>
+    <string name="about_content">El %1$s està creat per @fork-maintainers.</string>
 
     <!-- Private Browsing -->
     <!-- Explanation for private browsing displayed to users on home view when they first enable private mode
@@ -1358,7 +1358,7 @@
     <string name="etp_cryptominers_description">Impedeix que els scripts maliciosos tinguin accés al dispositiu per a la mineria de diners digitals.</string>
     <!-- Category of trackers (fingerprinters) that can be blocked by Enhanced Tracking Protection -->
     <string name="etp_fingerprinters_title">Generadors d’empremtes digitals</string>
-  
+
     <!-- Description of fingerprinters that can be blocked by Enhanced Tracking Protection -->
     <string name="etp_fingerprinters_description">Impedeix la recollida de dades sobre el vostre dispositiu que us podrien identificar, i que es poden utilitzar per fer-vos el seguiment.</string>
     <!-- Category of trackers (tracking content) that can be blocked by Enhanced Tracking Protection -->

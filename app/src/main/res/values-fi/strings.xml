@@ -55,7 +55,7 @@
     <string name="recently_saved_menu_item_remove">Poista</string>
 
     <!-- About content. The first parameter is the name of the application. (For example: Fenix) -->
-    <string name="about_content">%1$s on Mozillan tuote.</string>
+    <string name="about_content">%1$s on @fork-maintainers tuote.</string>
 
     <!-- Private Browsing -->
     <!-- Explanation for private browsing displayed to users on home view when they first enable private mode
@@ -1466,7 +1466,7 @@
         The first parameter is number of long clicks left to enable the menu -->
     <string name="about_debug_menu_toast_progress">Vianjäljitysvalikko: napsautuksia jäljellä %1$d</string>
     <string name="about_debug_menu_toast_done">Vianjäljitysvalikko käytössä</string>
-  
+
     <!-- Browser long press popup menu -->
     <!-- Copy the current url -->
     <string name="browser_toolbar_long_press_popup_copy">Kopioi</string>
@@ -1474,10 +1474,10 @@
     <string name="browser_toolbar_long_press_popup_paste_and_go">Liitä ja avaa</string>
     <!-- Paste the text in the clipboard -->
     <string name="browser_toolbar_long_press_popup_paste">Liitä</string>
-  
+
     <!-- Snackbar message shown after an URL has been copied to clipboard. -->
     <string name="browser_toolbar_url_copied_to_clipboard_snackbar">Osoite kopioitu leikepöydälle</string>
-  
+
     <!-- Title text for the Add To Homescreen dialog -->
     <string name="add_to_homescreen_title">Lisää aloitusnäytölle</string>
     <!-- Cancel button text for the Add to Homescreen dialog -->

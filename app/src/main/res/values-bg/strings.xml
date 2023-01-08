@@ -46,7 +46,7 @@
     <string name="recently_saved_menu_item_remove">Премахване</string>
 
     <!-- About content. The first parameter is the name of the application. (For example: Fenix) -->
-    <string name="about_content">%1$s е произведен от Mozilla.</string>
+    <string name="about_content">%1$s е произведен от @fork-maintainers.</string>
 
     <!-- Private Browsing -->
     <!-- Explanation for private browsing displayed to users on home view when they first enable private mode
@@ -1169,10 +1169,10 @@
     <string name="preference_enhanced_tracking_protection">Подобрена защита от проследяване</string>
     <!-- Title for the description of enhanced tracking protection -->
     <string name="preference_enhanced_tracking_protection_explanation_title">Разглеждайте без да сте следени</string>
-  
+
     <!-- Description of enhanced tracking protection. The first parameter is the name of the application (For example: Fenix) -->
     <string name="preference_enhanced_tracking_protection_explanation">Пазете вашите данни лични. %s ви предпазва от най-разпространените проследявания, които дебнат действията ви онлайн.</string>
-  
+
     <!-- Text displayed that links to website about enhanced tracking protection -->
     <string name="preference_enhanced_tracking_protection_explanation_learn_more">Научете повече</string>
 

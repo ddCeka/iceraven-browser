@@ -100,7 +100,13 @@ class HomeMenu(
     private fun syncSignInMenuItem(): BrowserMenuImageText? {
         val syncItemTitle =
             if (context.components.backgroundServices.accountManagerAvailableQueue.isReady()) {
-                accountManager.accountProfileEmail ?: context.getString(R.string.sync_menu_sync_and_save_data)
+                if (context.settings().showDisplayNameInsteadofEmail) {
+                    accountManager.accountProfileDisplayName
+                        ?: context.getString(R.string.sync_menu_sync_and_save_data)
+                } else {
+                    accountManager.accountProfileEmail
+                        ?: context.getString(R.string.sync_menu_sync_and_save_data)
+                }
             } else {
                 null
             }

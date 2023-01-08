@@ -18,7 +18,8 @@ import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
 import io.mockk.verifyOrder
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineScope
 import mozilla.components.concept.engine.prompt.ShareData
 import mozilla.components.concept.sync.Device
 import mozilla.components.concept.sync.DeviceType
@@ -29,19 +30,22 @@ import mozilla.components.feature.share.RecentAppsStorage
 import mozilla.components.service.glean.testing.GleanTestRule
 import mozilla.components.support.test.robolectric.testContext
 import mozilla.components.support.test.rule.MainCoroutineRule
-import mozilla.components.support.test.rule.runTestOnMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
-import org.junit.Rule
+import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mozilla.fenix.GleanMetrics.Events
 import org.mozilla.fenix.GleanMetrics.SyncAccount
 import org.mozilla.fenix.R
 import org.mozilla.fenix.components.FenixSnackbar
+import org.mozilla.fenix.components.metrics.MetricController
+import org.mozilla.fenix.ext.metrics
 import org.mozilla.fenix.ext.nav
 import org.mozilla.fenix.helpers.FenixRobolectricTestRunner
 import org.mozilla.fenix.share.listadapters.AppShareOption
@@ -50,6 +54,7 @@ import org.mozilla.fenix.share.listadapters.AppShareOption
 class ShareControllerTest {
     // Need a valid context to retrieve Strings for example, but we also need it to return our "metrics"
     private val context: Context = spyk(testContext)
+    private val metrics: MetricController = mockk(relaxed = true)
     private val shareSubject = "shareSubject"
     private val shareData = listOf(
         ShareData(url = "url0", title = "title0"),
@@ -75,11 +80,21 @@ class ShareControllerTest {
     @get:Rule
     val coroutinesTestRule = MainCoroutineRule()
     private val testDispatcher = coroutinesTestRule.testDispatcher
-    private val testCoroutineScope = coroutinesTestRule.scope
+    private val testCoroutineScope = TestCoroutineScope(testDispatcher)
     private val controller = DefaultShareController(
         context, shareSubject, shareData, sendTabUseCases, saveToPdfUseCase, snackbar, navController,
         recentAppStorage, testCoroutineScope, testDispatcher, dismiss,
     )
+
+    @Before
+    fun setUp() {
+        every { context.metrics } returns metrics
+    }
+
+    @After
+    fun cleanUp() {
+        testCoroutineScope.cleanupTestCoroutines()
+    }
 
     @Test
     fun `handleShareClosed should call a passed in delegate to close this`() {
@@ -88,8 +103,9 @@ class ShareControllerTest {
         verify { dismiss(ShareController.Result.DISMISSED) }
     }
 
+    @Ignore("Intermittently failing; will be fixed with #9212 and #8725.")
     @Test
-    fun `handleShareToApp should start a new sharing activity and close this`() = runTestOnMain {
+    fun `handleShareToApp should start a new sharing activity and close this`() = runBlocking {
         val appPackageName = "package"
         val appClassName = "activity"
         val appShareOption = AppShareOption("app", mockk(), appPackageName, appClassName)
@@ -106,7 +122,7 @@ class ShareControllerTest {
         every { recentAppStorage.updateRecentApp(appShareOption.activityName) } just Runs
 
         testController.handleShareToApp(appShareOption)
-        advanceUntilIdle()
+        testDispatcher.advanceUntilIdle()
 
         // Check that the Intent used for querying apps has the expected structure
         assertTrue(shareIntent.isCaptured)

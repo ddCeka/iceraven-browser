@@ -57,7 +57,7 @@
     <string name="recently_saved_menu_item_remove">Удалить</string>
 
     <!-- About content. The first parameter is the name of the application. (For example: Fenix) -->
-    <string name="about_content">%1$s разработан Mozilla.</string>
+    <string name="about_content">%1$s разработан @fork-maintainers.</string>
 
     <!-- Private Browsing -->
     <!-- Explanation for private browsing displayed to users on home view when they first enable private mode
@@ -1489,10 +1489,10 @@
     <string name="browser_toolbar_long_press_popup_paste_and_go">Вставить и перейти</string>
     <!-- Paste the text in the clipboard -->
     <string name="browser_toolbar_long_press_popup_paste">Вставить</string>
-  
+
     <!-- Snackbar message shown after an URL has been copied to clipboard. -->
     <string name="browser_toolbar_url_copied_to_clipboard_snackbar">Ссылка скопирована в буфер обмена</string>
-  
+
     <!-- Title text for the Add To Homescreen dialog -->
     <string name="add_to_homescreen_title">Добавить на домашний экран</string>
     <!-- Cancel button text for the Add to Homescreen dialog -->

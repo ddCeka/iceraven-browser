@@ -57,7 +57,7 @@
     <string name="recently_saved_menu_item_remove">移除</string>
 
     <!-- About content. The first parameter is the name of the application. (For example: Fenix) -->
-    <string name="about_content">%1$s 是由 Mozilla 所打造。</string>
+    <string name="about_content">%1$s 是由 @fork-maintainers 所打造。</string>
 
     <!-- Private Browsing -->
     <!-- Explanation for private browsing displayed to users on home view when they first enable private mode
@@ -599,6 +599,8 @@
     <string name="preference_top_toolbar">頂端</string>
     <!-- Preference for using bottom toolbar -->
     <string name="preference_bottom_toolbar">底端</string>
+    <!-- Preference for showing display name instead of email -->
+    <string name="preferences_show_displayname_insteadof_email">展示顯示名而不是郵件</string>
 
     <!-- Theme Preferences -->
     <!-- Preference for using light theme -->
@@ -1490,10 +1492,10 @@
     <string name="browser_toolbar_long_press_popup_paste_and_go">貼上並瀏覽</string>
     <!-- Paste the text in the clipboard -->
     <string name="browser_toolbar_long_press_popup_paste">貼上</string>
-  
+
     <!-- Snackbar message shown after an URL has been copied to clipboard. -->
     <string name="browser_toolbar_url_copied_to_clipboard_snackbar">已將網址複製至剪貼簿</string>
-  
+
     <!-- Title text for the Add To Homescreen dialog -->
     <string name="add_to_homescreen_title">新增至裝置主畫面</string>
     <!-- Cancel button text for the Add to Homescreen dialog -->

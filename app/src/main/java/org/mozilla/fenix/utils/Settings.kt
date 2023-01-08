@@ -86,7 +86,7 @@ class Settings(private val appContext: Context) : PreferencesHolder {
         internal var SEARCH_GROUP_MINIMUM_SITES: Int = 2
 
         // The maximum number of top sites to display.
-        const val TOP_SITES_MAX_COUNT = 16
+        const val TOP_SITES_MAX_COUNT = 160
 
         /**
          * Only fetch top sites from the [ContileTopSitesProvider] when the number of default and
@@ -291,17 +291,17 @@ class Settings(private val appContext: Context) : PreferencesHolder {
 
     val isTelemetryEnabled by booleanPreference(
         appContext.getPreferenceKey(R.string.pref_key_telemetry),
-        default = true,
+        default = false,
     )
 
     var isMarketingTelemetryEnabled by booleanPreference(
         appContext.getPreferenceKey(R.string.pref_key_marketing_telemetry),
-        default = !Config.channel.isMozillaOnline,
+        default = false,
     )
 
     var isExperimentationEnabled by booleanPreference(
         appContext.getPreferenceKey(R.string.pref_key_experimentation),
-        default = true,
+        default = false,
     )
 
     var isOverrideTPPopupsForPerformanceTest = false
@@ -740,6 +740,21 @@ class Settings(private val appContext: Context) : PreferencesHolder {
     val toolbarPosition: ToolbarPosition
         get() = if (shouldUseBottomToolbar) ToolbarPosition.BOTTOM else ToolbarPosition.TOP
 
+    var shouldStripUrl by booleanPreference(
+        appContext.getPreferenceKey(R.string.pref_key_strip_url),
+        default = true,
+    )
+
+    var showDisplayNameInsteadofEmail by booleanPreference(
+        appContext.getPreferenceKey(R.string.pref_key_show_displayname_insteadof_email),
+        default = true,
+    )
+
+    var shouldRelinquishMemoryUnderPressure by booleanPreference(
+        appContext.getPreferenceKey(R.string.pref_key_relinquish_memory_under_pressure),
+        default = true,
+    )
+
     /**
      * Check each active accessibility service to see if it can perform gestures, if any can,
      * then it is *likely* a switch service is enabled. We are assuming this to be the case based on #7486
@@ -1132,6 +1147,16 @@ class Settings(private val appContext: Context) : PreferencesHolder {
     var openTabsCount by intPreference(
         appContext.getPreferenceKey(R.string.pref_key_open_tabs_count),
         0,
+    )
+
+    val customAddonsAccount by stringPreference(
+        appContext.getPreferenceKey(R.string.pref_key_addons_custom_account),
+        BuildConfig.AMO_COLLECTION_USER,
+    )
+
+    val customAddonsCollection by stringPreference(
+        appContext.getPreferenceKey(R.string.pref_key_addons_custom_collection),
+        BuildConfig.AMO_COLLECTION_NAME,
     )
 
     var mobileBookmarksSize by intPreference(

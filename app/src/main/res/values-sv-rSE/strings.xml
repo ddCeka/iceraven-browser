@@ -54,7 +54,7 @@
     <string name="recently_saved_menu_item_remove">Ta bort</string>
 
     <!-- About content. The first parameter is the name of the application. (For example: Fenix) -->
-    <string name="about_content">%1$s produceras av Mozilla.</string>
+    <string name="about_content">%1$s produceras av @fork-maintainers.</string>
 
     <!-- Private Browsing -->
     <!-- Explanation for private browsing displayed to users on home view when they first enable private mode
@@ -1473,10 +1473,10 @@
     <string name="browser_toolbar_long_press_popup_paste_and_go">Klistra in och kör</string>
     <!-- Paste the text in the clipboard -->
     <string name="browser_toolbar_long_press_popup_paste">Klistra in</string>
-  
+
     <!-- Snackbar message shown after an URL has been copied to clipboard. -->
     <string name="browser_toolbar_url_copied_to_clipboard_snackbar">URL kopierad till urklipp</string>
-  
+
     <!-- Title text for the Add To Homescreen dialog -->
     <string name="add_to_homescreen_title">Lägg till på startsidan</string>
     <!-- Cancel button text for the Add to Homescreen dialog -->

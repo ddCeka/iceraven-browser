@@ -17,6 +17,10 @@
 # If Sentry ever mysteriously stops working after we upgrade it, this could be why.
 -keep class io.sentry.event.Event { *; }
 
+# Iceraven release build mysteriously cannot find a lot of Sentry.
+# Luckily we do not really want it anyway.
+-dontwarn io.sentry.**
+
 ####################################################################################################
 # Android and GeckoView built-ins
 ####################################################################################################
